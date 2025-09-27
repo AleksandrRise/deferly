@@ -10,7 +10,10 @@
       "Bash(curl:*)",
       "Bash(node:*)",
       "Bash(timeout 10 npm run dev)",
-      "Bash(npm run lint)"
+      "Bash(npm run lint)",
+      "Bash(rm:*)",
+      "WebFetch(domain:tailwindcss.com)",
+      "Bash(timeout 30s npm run build)"
     ],
     "deny": []
   }

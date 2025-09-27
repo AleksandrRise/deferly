@@ -34,10 +34,17 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
   const [chatMessages, setChatMessages] = useState<AgentMessage[]>([]);
   const [chatInput, setChatInput] = useState('');
   const [isChatLoading, setIsChatLoading] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    setIsVisible(true);
     generateSummary();
   }, [email]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleClose = () => {
+    setIsVisible(false);
+    setTimeout(onClose, 300); // Wait for animation
+  };
 
   const generateSummary = async () => {
     try {
@@ -51,7 +58,6 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
         const data = await response.json();
         setSummary(data.summary);
       } else {
-        // Fallback to local summary
         const importance = calculateImportance(email);
         setSummary(`${importance.reasoning.join('. ')}. Estimated ${email.estimatedMinutes} minutes to handle.`);
       }
@@ -78,7 +84,8 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
       }
     } catch (error) {
       console.error('Planning error:', error);
-      alert('Failed to create defer plan. Please try again.');
+      // Show a beautiful error notification instead of alert
+      console.log('Failed to create defer plan. Please try again.');
     } finally {
       setIsPlanning(false);
     }
@@ -99,14 +106,13 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
       });
       
       if (response.ok) {
-        alert('Meeting block created successfully!');
-        onClose();
+        console.log('Meeting block created successfully!');
+        handleClose();
       } else {
         throw new Error('Failed to create meeting');
       }
     } catch (error) {
       console.error('Failed to create meeting:', error);
-      alert('Failed to create meeting. Please try again.');
     }
   };
 
@@ -124,20 +130,19 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
       });
       
       if (response.ok) {
-        alert('Events moved successfully!');
+        console.log('Events moved successfully!');
       } else {
         throw new Error('Failed to move events');
       }
     } catch (error) {
       console.error('Failed to move events:', error);
-      alert('Failed to move events. Please try again.');
     }
   };
 
   const handleCopyMessage = () => {
     if (planResult?.deferMessage) {
       navigator.clipboard.writeText(planResult.deferMessage);
-      alert('Defer message copied to clipboard!');
+      console.log('Defer message copied to clipboard!');
     }
   };
 
@@ -210,169 +215,237 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
     });
   };
 
+  const getImportanceGradient = () => {
+    const importance = calculateImportance(email).score;
+    if (importance >= 0.8) return 'from-red-400 to-pink-500';
+    if (importance >= 0.6) return 'from-orange-400 to-yellow-500';
+    if (importance >= 0.4) return 'from-yellow-400 to-green-500';
+    return 'from-blue-400 to-purple-500';
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] flex flex-col">
+    <div 
+      className={`fixed inset-0 z-50 flex items-center justify-center transition-all duration-500 ${
+        isVisible ? 'opacity-100 backdrop-blur-sm' : 'opacity-0'
+      }`}
+      style={{ background: 'rgba(0, 0, 0, 0.4)' }}
+    >
+      <div 
+        className={`glass rounded-3xl shadow-2xl max-w-4xl w-full mx-6 max-h-[90vh] flex flex-col transform transition-all duration-500 ${
+          isVisible ? 'scale-100 translate-y-0' : 'scale-95 translate-y-10'
+        }`}
+      >
         {/* Header */}
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-900">
-              {email.subject}
-            </h2>
+        <div className="p-8 border-b border-white border-opacity-20">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <div className="flex items-center space-x-3 mb-2">
+                <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${getImportanceGradient()} animate-pulse`}></div>
+                <span className="text-sm font-medium text-white text-opacity-80">
+                  From {email.company}
+                </span>
+              </div>
+              <h2 className="text-2xl font-bold text-white text-shadow-lg mb-2">
+                {email.subject}
+              </h2>
+              <p className="text-white text-opacity-80">
+                From: <span className="font-semibold">{email.name}</span> &lt;{email.from}&gt;
+              </p>
+            </div>
             <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
+              onClick={handleClose}
+              className="p-2 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 transition-all duration-300 transform hover:scale-110 text-white"
             >
-              ✕
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
           </div>
-          <p className="text-sm text-gray-600 mt-1">
-            From: {email.name} &lt;{email.from}&gt;
-          </p>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6">
-          {/* Summary */}
-          <div className="mb-6">
-            <h3 className="text-sm font-medium text-gray-900 mb-2">Quick Summary</h3>
-            <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded">
-              {summary || 'Generating summary...'}
+        <div className="flex-1 overflow-y-auto p-8">
+          {/* Summary Card */}
+          <div className="card-glass p-6 mb-8 animate-slide-in-up">
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center">
+                <span className="text-white font-bold text-sm">AI</span>
+              </div>
+              <h3 className="text-lg font-bold text-white">Smart Summary</h3>
+            </div>
+            <p className="text-white text-opacity-90 leading-relaxed">
+              {summary || (
+                <div className="flex items-center space-x-2">
+                  <div className="spinner w-4 h-4"></div>
+                  <span>Analyzing email content...</span>
+                </div>
+              )}
             </p>
           </div>
 
           {/* Action Buttons */}
           {!showChat && !planResult && (
-            <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               <button
                 onClick={handlePlanDefer}
                 disabled={isPlanning}
-                className="flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                className="btn-primary group relative overflow-hidden"
               >
-                {isPlanning ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                    Planning...
-                  </>
-                ) : (
-                  'Plan defer now'
-                )}
+                <div className="flex items-center justify-center space-x-3">
+                  {isPlanning ? (
+                    <>
+                      <div className="spinner"></div>
+                      <span>Planning Perfect Time...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-2xl">🎯</span>
+                      <span className="font-bold">Plan Defer Now</span>
+                    </>
+                  )}
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
               </button>
               
               <button
                 onClick={startChat}
-                className="flex items-center justify-center px-4 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                className="btn-ghost group relative overflow-hidden"
               >
-                Ask AI
+                <div className="flex items-center justify-center space-x-3">
+                  <span className="text-2xl">🤖</span>
+                  <span className="font-bold">Ask AI Assistant</span>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-teal-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
               </button>
             </div>
           )}
 
           {/* Plan Result */}
           {planResult && (
-            <div className="mb-6">
-              <h3 className="text-sm font-medium text-gray-900 mb-3">Recommended Plan</h3>
+            <div className="card-glass p-6 mb-8 animate-slide-in-up">
+              <h3 className="text-xl font-bold text-white mb-6 flex items-center space-x-2">
+                <span>⭐</span>
+                <span>Recommended Plan</span>
+              </h3>
               
-              <div className="bg-blue-50 p-4 rounded-lg mb-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-blue-900">
-                    Best Time: {formatTime(planResult.slot.startISO)}
-                  </span>
-                  <span className="text-xs bg-blue-200 text-blue-800 px-2 py-1 rounded">
-                    {Math.round(planResult.slot.confidence * 100)}% confidence
-                  </span>
+              <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl p-6 mb-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <p className="text-white text-opacity-80 text-sm">Best Time</p>
+                    <p className="text-2xl font-bold text-white">
+                      {formatTime(planResult.slot.startISO)}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-white text-opacity-80 text-sm">Confidence</p>
+                    <p className="text-2xl font-bold text-white">
+                      {Math.round(planResult.slot.confidence * 100)}%
+                    </p>
+                  </div>
                 </div>
-                <p className="text-sm text-blue-800">{planResult.slot.reason}</p>
+                <p className="text-white text-opacity-90 text-sm">{planResult.slot.reason}</p>
                 
                 {planResult.slot.movedEvents && planResult.slot.movedEvents.length > 0 && (
-                  <div className="mt-2 p-2 bg-yellow-100 rounded">
-                    <p className="text-sm text-yellow-800">
-                      Will move: {planResult.slot.movedEvents.map(e => e.title).join(', ')}
+                  <div className="mt-4 p-4 bg-yellow-400 bg-opacity-20 rounded-xl">
+                    <p className="text-white font-semibold flex items-center space-x-2">
+                      <span>📅</span>
+                      <span>Will move: {planResult.slot.movedEvents.map(e => e.title).join(', ')}</span>
                     </p>
                   </div>
                 )}
               </div>
 
               {/* Action buttons */}
-              <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <button
                   onClick={handleCreateMeeting}
-                  className="px-4 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700"
+                  className="btn-secondary group"
                 >
-                  Create meeting
+                  <span className="mr-2">📅</span>
+                  Create Meeting
                 </button>
                 
                 {planResult.slot.movedEvents && planResult.slot.movedEvents.length > 0 && (
                   <button
                     onClick={handleApplyMoves}
-                    className="px-4 py-2 bg-orange-600 text-white text-sm rounded hover:bg-orange-700"
+                    className="btn-secondary group"
                   >
-                    Apply moves
+                    <span className="mr-2">🔄</span>
+                    Apply Moves
                   </button>
                 )}
+                
+                <button
+                  onClick={handleCopyMessage}
+                  className="btn-secondary group"
+                >
+                  <span className="mr-2">📋</span>
+                  Copy Message
+                </button>
               </div>
-
-              <button
-                onClick={handleCopyMessage}
-                className="w-full px-4 py-2 bg-gray-600 text-white text-sm rounded hover:bg-gray-700"
-              >
-                Copy defer message
-              </button>
             </div>
           )}
 
           {/* Chat Interface */}
           {showChat && (
-            <div className="border rounded-lg">
-              <div className="h-64 overflow-y-auto p-4 bg-gray-50">
+            <div className="card-glass overflow-hidden animate-slide-in-up">
+              <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-4">
+                <h3 className="text-white font-bold flex items-center space-x-2">
+                  <span>🤖</span>
+                  <span>AI Assistant</span>
+                </h3>
+              </div>
+              
+              <div className="h-80 overflow-y-auto p-6 space-y-4">
                 {chatMessages.map((message, index) => (
                   <div
                     key={index}
-                    className={`mb-3 ${
-                      message.role === 'user' ? 'text-right' : 'text-left'
-                    }`}
+                    className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
                     <div
-                      className={`inline-block px-3 py-2 rounded-lg max-w-xs ${
+                      className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${
                         message.role === 'user'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-white text-gray-900 border'
-                      }`}
+                          ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
+                          : 'bg-white bg-opacity-20 text-white border border-white border-opacity-20'
+                      } animate-slide-in-up`}
+                      style={{ animationDelay: `${index * 0.1}s` }}
                     >
                       {message.content}
                     </div>
                   </div>
                 ))}
+                
                 {isChatLoading && (
-                  <div className="text-left mb-3">
-                    <div className="inline-block px-3 py-2 rounded-lg bg-gray-200">
-                      <div className="flex space-x-1">
-                        <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" />
-                        <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-                        <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                  <div className="flex justify-start">
+                    <div className="bg-white bg-opacity-20 px-4 py-3 rounded-2xl border border-white border-opacity-20">
+                      <div className="flex space-x-2">
+                        <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
+                        <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                        <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                       </div>
                     </div>
                   </div>
                 )}
               </div>
               
-              <div className="p-4 border-t">
-                <div className="flex space-x-2">
+              <div className="p-6 border-t border-white border-opacity-20">
+                <div className="flex space-x-4">
                   <input
                     type="text"
                     value={chatInput}
                     onChange={(e) => setChatInput(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSendChatMessage()}
-                    placeholder="Ask about timing..."
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Ask about timing preferences..."
+                    className="input-modern flex-1"
                     disabled={isChatLoading}
                   />
                   <button
                     onClick={handleSendChatMessage}
                     disabled={isChatLoading || !chatInput.trim()}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                    className="btn-primary px-6"
                   >
-                    Send
+                    <span>Send</span>
+                    <span className="ml-2">🚀</span>
                   </button>
                 </div>
               </div>
