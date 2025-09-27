@@ -1,0 +1,163 @@
+CONTINUE IN CURRENT REPO — DO NOT RESTART
+
+App: Deferly
+Pages: exactly 2 — "/" (Landing) and "/calendar" (Calendar).
+Data: mock-first; switch to live Gmail/Calendar via Composio only if keys exist.
+
+Landing (/) — emails-only, two sort modes
+
+Email list (no other widgets on the page)
+
+Source: GET /api/emails (mock or Composio).
+
+Render cards: sender, subject, receivedAt, snippet.
+
+Sort toggle (two tiny buttons, top-right of the list)
+
+Importance (default) and Recency.
+
+Implement importance scoring:
+
+If LLM key exists → call POST /api/rank (new) to LLM-rank emails.
+
+Else local heuristic lib/importance.ts: score ∈ [0,1] using:
+
+keywords: EOD, ASAP, urgent, tomorrow, by <time/day>
+
+has deadlineISO → +0.4; question marks → +0.1; numbers/dates → +0.1
+
+sender weight: external domain or client|ceo|vp in from → +0.1
+
+fallback to email.importance if provided
+
+Sort descending by importance; Recency sorts by receivedAt desc.
+
+Email click → Drawer with TWO choices
+
+Load quick summary (1–2 lines) via lib/summarizer.ts (LLM optional enhancement).
+
+Show two primary actions (buttons side-by-side):
+
+A) Plan defer now
+
+On click → call POST /api/plan with { emailId }.
+
+The planner must:
+
+Parse any requested time window from the email (simple regex for day/time).
+
+Scan calendar to find a slot. If the requested window conflicts, evaluate moving overlapping events using a movability score:
+
+Movable if: no attendees OR title matches /focus|hold|buffer|deep work/i OR mock event has flexible: true.
+
+Not movable if: /client|interview|1:1|standup|review/i or has attendees.
+
+If movable, propose a new slot the same day within working hours; update plan with movedEvents.
+
+Else, find the next empty slot (today before 17:00; otherwise tomorrow 09:30).
+
+Return:
+
+{
+  slot: { startISO, endISO, reason, confidence, movedEvents?: Event[] },
+  alternatives: Array<{ startISO, endISO, reason }>,
+  deferMessage: string, // polite message to reschedule/ack
+  action: "reply_now" | "snooze_today" | "snooze_tomorrow" | "schedule_block"
+}
+
+
+In the drawer, show:
+
+Best time (HH:MM AM/PM), reason, confidence, and if applicable “Will move: <event> → <new time>”.
+
+Buttons:
+
+Create meeting at best time (Composio if configured; else add in-memory block)
+
+Apply moves (if any movable events)
+
+Copy defer message
+
+B) Ask AI (discuss timing)
+
+Inline chat area in the drawer (no new page).
+
+Agent loads the email + calendar context and suggests 2–3 options.
+
+User can say “What about tomorrow afternoon?” Agent updates candidates and, on Approve, creates event (and moves flexible events if user agreed).
+
+Endpoint: POST /api/agent (reuse existing if present). Fallback: call /api/plan repeatedly with constraints { after: ..., before: ... }.
+
+Calendar (/calendar) — mocked or retrieved
+
+Day view 09:00–18:00, 15-min grid.
+
+GET /api/calendar returns base events + any reply blocks and moved events kept in an in-memory store inside the route module (don’t mutate JSON on disk; resets on cold start).
+
+Render non-overlapping cards; left accent by action:
+
+reply_now=green, snooze_today=blue, snooze_tomorrow=purple, schedule_block=orange.
+
+If events were “moved”, show a small “moved” badge on the new card.
+
+Endpoints (add/verify)
+
+GET /api/emails — mocks or Composio.
+
+GET /api/calendar — mocks + in-memory { replyBlocks, movedEvents }.
+
+POST /api/suggest — keep for legacy simple suggestion if already used.
+
+POST /api/rank — optional LLM importance ranking; else compute client-side via lib/importance.ts.
+
+POST /api/plan — implements the Plan defer now behavior above (slot selection, movability, deferMessage, alternatives).
+
+POST /api/agent — optional chat to negotiate time; on approve, create event and moves.
+
+Minimal file tasks
+
+components/EmailList.tsx → add Importance/Recency segmented control; fetch & sort.
+
+components/EmailDrawer.tsx → show summary; add buttons Plan defer now and Ask AI; implement planner UI (best time, reason, confidence, moved badge, Copy message, Create meeting, Apply moves).
+
+lib/importance.ts → local importance scoring (heuristic fallback).
+
+app/api/plan/route.ts → implement planner logic + movability rules.
+
+app/api/calendar/route.ts → maintain in-memory stores for replyBlocks & movedEvents.
+
+Heuristics (reuse from engine + add movability)
+
+Working hours: 09–18; lunch 12–13 low-fit unless urgency ≥ 0.9.
+
+Movability score:
+
++0.6 if no attendees; +0.3 if title matches /focus|hold|buffer|deep work/i; +0.1 if duration ≤30m.
+
+−0.7 if title matches /client|interview|1:1|standup|review/i or attendees>0.
+
+Movable if score ≥ 0.4.
+
+If moving, keep within same day; otherwise treat as non-movable and pick next free slot.
+
+Defer message template
+
+Hi {Name} — I’m booked at that time. I can make {OptionA} or {OptionB} work. 
+If neither is ideal, I can shift a flexible block to accommodate {PreferredWindow}. 
+Let me know what you prefer, and I’ll send the invite. Thanks!
+
+Acceptance (don’t stop until these pass)
+
+/ shows only emails with Importance/Recency toggles; sorting works.
+
+Clicking an email shows drawer with Plan defer now and Ask AI options.
+
+Plan defer now returns a best slot, reason, confidence, and—if needed—a moved event plan plus a polite defer message.
+
+Create meeting (and Apply moves, if any) reflects on /calendar.
+
+Ask AI lets the user negotiate time and approve to create the event.
+
+No console errors; responsive.
+
+Make surgical changes only. Do not scaffold a new app.

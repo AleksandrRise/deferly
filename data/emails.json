@@ -1,0 +1,45 @@
+[
+  {
+    "id": "email-1",
+    "from": "priya.sharma@techstartup.io",
+    "name": "Priya Sharma",
+    "company": "TechStartup",
+    "subject": "Quick feedback on marketing proposal",
+    "preview": "Hi! Could you review the attached marketing proposal? We'd love your thoughts on the Q1 campaign strategy...",
+    "body": "Hi there,\n\nI hope this email finds you well! We've been working on our Q1 marketing campaign strategy and would really value your expertise. Could you take a look at the attached proposal and share your thoughts?\n\nSpecifically, we're looking for feedback on:\n- Budget allocation across channels\n- Timeline feasibility\n- Creative direction\n\nWe have a stakeholder meeting tomorrow at noon, so any insights before then would be incredibly helpful.\n\nBest regards,\nPriya",
+    "timestamp": "2025-09-27T14:30:00-07:00",
+    "importance": 0.8,
+    "estimatedMinutes": 15,
+    "deadlineISO": "2025-09-28T12:00:00-07:00",
+    "tags": ["review", "urgent"],
+    "hasAttachment": true
+  },
+  {
+    "id": "email-2", 
+    "from": "it-support@company.com",
+    "name": "IT Support",
+    "company": "Company IT",
+    "subject": "System maintenance scheduled for this weekend",
+    "preview": "This is to inform you that we have scheduled system maintenance for this weekend. The systems will be down from...",
+    "body": "Dear Team,\n\nThis is to inform you that we have scheduled system maintenance for this weekend. The maintenance window is as follows:\n\nDate: Saturday, September 28th\nTime: 11:00 PM - 3:00 AM PDT\nAffected Systems: Email, VPN, Internal Tools\n\nDuring this time, you may experience intermittent connectivity issues. We recommend saving your work frequently and avoiding any critical tasks during the maintenance window.\n\nIf you have any questions or concerns, please don't hesitate to reach out.\n\nBest regards,\nIT Support Team",
+    "timestamp": "2025-09-27T09:15:00-07:00",
+    "importance": 0.3,
+    "estimatedMinutes": 5,
+    "tags": ["fyi", "maintenance"],
+    "hasAttachment": false
+  },
+  {
+    "id": "email-3",
+    "from": "jordan.kim@designagency.com", 
+    "name": "Jordan Kim",
+    "company": "Design Agency",
+    "subject": "Project timeline discussion - Brand redesign",
+    "preview": "Hope you're doing well! I wanted to touch base about the brand redesign project timeline. We've made great progress...",
+    "body": "Hi,\n\nHope you're doing well! I wanted to touch base about the brand redesign project timeline. We've made great progress on the initial concepts and are ready to move into the refinement phase.\n\nHowever, I wanted to discuss adjusting our timeline slightly. The client has requested some additional research that would add about 2 weeks to our original schedule. I think this extra time would actually result in a much stronger final product.\n\nCould we schedule a call sometime next week to go over the details? I'm flexible on timing - just let me know what works best for you.\n\nI've also attached the latest mockups for your review.\n\nThanks!\nJordan",
+    "timestamp": "2025-09-27T11:45:00-07:00",
+    "importance": 0.6,
+    "estimatedMinutes": 40,
+    "tags": ["meeting", "project"],
+    "hasAttachment": true
+  }
+]

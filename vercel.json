@@ -1,0 +1,14 @@
+{
+  "functions": {
+    "app/api/agent/route.ts": {
+      "maxDuration": 30
+    }
+  },
+  "env": {
+    "NEXT_PUBLIC_APP_NAME": "@vercel_env_NEXT_PUBLIC_APP_NAME",
+    "TIMEZONE": "@vercel_env_TIMEZONE",
+    "OPENAI_API_KEY": "@vercel_env_OPENAI_API_KEY",
+    "COMPOSIO_API_KEY": "@vercel_env_COMPOSIO_API_KEY",
+    "COMPOSIO_PROVIDER": "@vercel_env_COMPOSIO_PROVIDER"
+  }
+}

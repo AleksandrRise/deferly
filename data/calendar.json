@@ -1,0 +1,41 @@
+[
+  {
+    "id": "cal-1",
+    "title": "Team Standup",
+    "start": "2025-09-27T09:00:00-07:00",
+    "end": "2025-09-27T09:30:00-07:00",
+    "type": "meeting",
+    "attendees": ["team@company.com"]
+  },
+  {
+    "id": "cal-2",
+    "title": "Focus Block - Development",
+    "start": "2025-09-27T10:00:00-07:00", 
+    "end": "2025-09-27T11:30:00-07:00",
+    "type": "focus",
+    "description": "Deep work on feature implementation"
+  },
+  {
+    "id": "cal-3",
+    "title": "Lunch",
+    "start": "2025-09-27T12:00:00-07:00",
+    "end": "2025-09-27T13:00:00-07:00",
+    "type": "break"
+  },
+  {
+    "id": "cal-4",
+    "title": "Client Check-in",
+    "start": "2025-09-27T14:00:00-07:00",
+    "end": "2025-09-27T14:30:00-07:00",
+    "type": "meeting",
+    "attendees": ["client@example.com"]
+  },
+  {
+    "id": "cal-5",
+    "title": "Project Planning",
+    "start": "2025-09-27T15:30:00-07:00",
+    "end": "2025-09-27T16:30:00-07:00",
+    "type": "meeting",
+    "attendees": ["planning-team@company.com"]
+  }
+]
