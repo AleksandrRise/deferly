@@ -186,7 +186,7 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
       console.error('Chat error:', error);
       const errorMessage: AgentMessage = {
         role: 'assistant',
-        content: "I'm having trouble right now. You can use the 'Plan defer now' option for automated suggestions.",
+        content: "I'm having trouble connecting to Gemini AI right now. You can use the 'Plan defer now' option for automated suggestions.",
         timestamp: new Date().toISOString()
       };
       setChatMessages(prev => [...prev, errorMessage]);
@@ -254,7 +254,7 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
             </div>
             <button
               onClick={handleClose}
-              className="p-2 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 transition-all duration-300 transform hover:scale-110 text-white"
+              className="p-2 rounded-full bg-red-500 bg-opacity-80 hover:bg-red-600 hover:bg-opacity-90 transition-all duration-300 transform hover:scale-110 text-white"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -313,7 +313,7 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
               >
                 <div className="flex items-center justify-center space-x-3">
                   <span className="text-2xl">🤖</span>
-                  <span className="font-bold">Ask AI Assistant</span>
+                  <span className="font-bold">Ask Gemini AI</span>
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-teal-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
               </button>
@@ -392,7 +392,7 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
               <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-4">
                 <h3 className="text-white font-bold flex items-center space-x-2">
                   <span>🤖</span>
-                  <span>AI Assistant</span>
+                  <span>Gemini AI Assistant</span>
                 </h3>
               </div>
               
@@ -406,7 +406,7 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
                       className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${
                         message.role === 'user'
                           ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
-                          : 'bg-white bg-opacity-20 text-white border border-white border-opacity-20'
+                          : 'bg-gray-800 text-white border border-gray-600'
                       } animate-slide-in-up`}
                       style={{ animationDelay: `${index * 0.1}s` }}
                     >
@@ -417,7 +417,7 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
                 
                 {isChatLoading && (
                   <div className="flex justify-start">
-                    <div className="bg-white bg-opacity-20 px-4 py-3 rounded-2xl border border-white border-opacity-20">
+                    <div className="bg-gray-800 px-4 py-3 rounded-2xl border border-gray-600">
                       <div className="flex space-x-2">
                         <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
                         <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>

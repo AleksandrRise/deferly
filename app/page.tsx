@@ -21,6 +21,92 @@ export default function Home() {
         setEmails(emailsData);
       } catch (error) {
         console.error('Failed to load emails:', error);
+        // Fallback to mock data
+        const mockEmails = [
+          {
+            id: '1',
+            name: 'Sarah Chen',
+            company: 'TechCorp',
+            from: 'sarah@techcorp.com',
+            subject: 'Urgent: Project deadline moved to tomorrow',
+            preview: 'Hi there! I wanted to let you know that we need to move the project deadline up by a week. This will require us to prioritize...',
+            body: 'Hi there! I wanted to let you know that we need to move the project deadline up by a week. This will require us to prioritize several key features and may impact the timeline for other projects. Please let me know if this causes any issues on your end and how we can best coordinate this change.',
+            timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+            importance: 0.9,
+            deadlineISO: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+            estimatedMinutes: 15,
+            hasAttachment: true,
+            tags: ['urgent', 'deadline', 'project']
+          },
+          {
+            id: '2',
+            name: 'Mike Johnson',
+            company: 'Design Studio',
+            from: 'mike@designstudio.com',
+            subject: 'New mockups for review',
+            preview: 'I have completed the new UI mockups for the mobile app. Could you please review them when you have a chance? I think you will...',
+            body: 'I have completed the new UI mockups for the mobile app. Could you please review them when you have a chance? I think you will be pleased with the direction we have taken. The new design incorporates all the feedback from the last review session.',
+            timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+            importance: 0.6,
+            estimatedMinutes: 30,
+            hasAttachment: true,
+            tags: ['design', 'review', 'mockups']
+          },
+          {
+            id: '3',
+            name: 'Lisa Park',
+            company: 'Marketing Pro',
+            from: 'lisa@marketingpro.com',
+            subject: 'Weekly sync meeting notes',
+            preview: 'Thanks for joining the weekly sync today. Here are the key takeaways and action items we discussed during the meeting...',
+            body: 'Thanks for joining the weekly sync today. Here are the key takeaways and action items we discussed during the meeting. Please review and let me know if I missed anything important.',
+            timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+            importance: 0.3,
+            estimatedMinutes: 10,
+            tags: ['meeting', 'notes', 'weekly']
+          },
+          {
+            id: '4',
+            name: 'David Wilson',
+            company: 'Startup Inc',
+            from: 'david@startup.com',
+            subject: 'Investment opportunity discussion',
+            preview: 'I hope this email finds you well. I wanted to reach out regarding a potential investment opportunity that might interest you...',
+            body: 'I hope this email finds you well. I wanted to reach out regarding a potential investment opportunity that might interest you. We are looking for strategic partners for our next funding round.',
+            timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+            importance: 0.8,
+            estimatedMinutes: 45,
+            tags: ['investment', 'opportunity', 'business']
+          },
+          {
+            id: '5',
+            name: 'Emma Thompson',
+            company: 'HR Solutions',
+            from: 'emma@hrsolutions.com',
+            subject: 'Team building event planning',
+            preview: 'Hope you are doing well! I am organizing our quarterly team building event and would love to get your input on activities and venue...',
+            body: 'Hope you are doing well! I am organizing our quarterly team building event and would love to get your input on activities and venue options. Please let me know your availability for a planning call.',
+            timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+            importance: 0.4,
+            estimatedMinutes: 20,
+            tags: ['hr', 'team-building', 'planning']
+          },
+          {
+            id: '6',
+            name: 'Alex Rodriguez',
+            company: 'Tech Consulting',
+            from: 'alex@techconsulting.com',
+            subject: 'Code review feedback',
+            preview: 'I have reviewed the latest code changes and have some feedback. Overall the implementation looks good, but there are a few areas...',
+            body: 'I have reviewed the latest code changes and have some feedback. Overall the implementation looks good, but there are a few areas that could be improved for better performance and maintainability.',
+            timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
+            importance: 0.5,
+            estimatedMinutes: 25,
+            hasAttachment: false,
+            tags: ['code-review', 'feedback', 'development']
+          }
+        ];
+        setEmails(mockEmails);
       } finally {
         setIsLoading(false);
       }
@@ -147,7 +233,7 @@ export default function Home() {
                   {getGreeting()}! Ready to tackle your inbox?
                 </h2>
                 <p className="text-white text-opacity-80">
-                  Let's find the perfect time to handle your emails
+                  Let&apos;s find the perfect time to handle your emails
                 </p>
               </div>
               
@@ -184,7 +270,7 @@ export default function Home() {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex relative">
+      <div className="flex-1 flex relative min-h-0">
         {/* Background pattern */}
         <div className="absolute inset-0 opacity-5">
           <div className="absolute inset-0" style={{
@@ -211,7 +297,7 @@ export default function Home() {
                 Select an email to get started
               </h3>
               <p className="text-white text-opacity-80 text-lg leading-relaxed">
-                Choose an email from your inbox and I'll help you find the perfect time to respond with smart scheduling suggestions.
+                Choose an email from your inbox and I&apos;ll help you find the perfect time to respond with smart scheduling suggestions.
               </p>
               <div className="mt-8 flex justify-center space-x-4">
                 <div className="glass-dark rounded-xl px-4 py-3 animate-pulse">

@@ -61,7 +61,7 @@ export default function EmailList({ emails, selectedEmailId, onSelectEmail }: Em
   };
 
   return (
-    <div className="w-96 glass-dark backdrop-blur-lg flex flex-col animate-slide-in-left">
+    <div className="w-96 h-full glass-dark backdrop-blur-lg flex flex-col animate-slide-in-left">
       {/* Header with toggle */}
       <div className="p-6 border-b border-white border-opacity-20">
         <div className="flex items-center justify-between mb-4">
@@ -79,7 +79,7 @@ export default function EmailList({ emails, selectedEmailId, onSelectEmail }: Em
             className={`flex-1 px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-300 ${
               sortMode === 'importance'
                 ? 'bg-white text-purple-600 shadow-lg transform scale-105'
-                : 'text-white text-opacity-80 hover:text-white hover:bg-white hover:bg-opacity-10'
+                : 'text-white text-opacity-80 hover:text-purple-600 hover:bg-white hover:bg-opacity-90'
             }`}
           >
             🎯 Importance
@@ -89,7 +89,7 @@ export default function EmailList({ emails, selectedEmailId, onSelectEmail }: Em
             className={`flex-1 px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-300 ${
               sortMode === 'recency'
                 ? 'bg-white text-purple-600 shadow-lg transform scale-105'
-                : 'text-white text-opacity-80 hover:text-white hover:bg-white hover:bg-opacity-10'
+                : 'text-white text-opacity-80 hover:text-purple-600 hover:bg-white hover:bg-opacity-90'
             }`}
           >
             ⏰ Recency
@@ -112,10 +112,10 @@ export default function EmailList({ emails, selectedEmailId, onSelectEmail }: Em
               onMouseLeave={() => setHoveredEmail(null)}
               className={`card-glass p-4 cursor-pointer transition-all duration-500 transform animate-slide-in-up ${
                 isSelected
-                  ? 'scale-105 ring-2 ring-white ring-opacity-50 bg-white bg-opacity-40'
+                  ? 'scale-105 ring-2 ring-purple-400 ring-opacity-70 bg-purple-600 bg-opacity-20'
                   : isHovered
-                  ? 'scale-102 bg-white bg-opacity-30'
-                  : 'hover:bg-white hover:bg-opacity-20'
+                  ? 'scale-102 bg-white bg-opacity-15'
+                  : 'hover:bg-white hover:bg-opacity-10'
               }`}
               style={{ animationDelay: `${index * 0.1}s` }}
             >

@@ -121,6 +121,12 @@ export default function CalendarPage() {
           </div>
           <div className="flex items-center space-x-4">
             <button
+              onClick={() => alert('Google Calendar integration coming soon! This will sync your events automatically.')}
+              className="text-sm px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg font-medium"
+            >
+              📅 Connect Google Calendar
+            </button>
+            <button
               onClick={handleClearDynamic}
               className="text-sm px-3 py-1 text-gray-600 hover:text-gray-900 border border-gray-300 rounded"
             >
