@@ -35,11 +35,17 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
   const [chatInput, setChatInput] = useState('');
   const [isChatLoading, setIsChatLoading] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [notification, setNotification] = useState<{message: string, type: 'success' | 'error'} | null>(null);
 
   useEffect(() => {
     setIsVisible(true);
     generateSummary();
   }, [email]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const showNotification = (message: string, type: 'success' | 'error' = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 3000);
+  };
 
   const handleClose = () => {
     setIsVisible(false);
@@ -63,7 +69,7 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
       }
     } catch (error) {
       console.error('Failed to generate summary:', error);
-      setSummary(`Email from ${email.name} about ${email.subject.toLowerCase()}.`);
+      setSummary(`Email from ${email.name} about ${email.subject.toLowerCase()}. Requires attention based on content analysis.`);
     }
   };
 
@@ -79,13 +85,13 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
       if (response.ok) {
         const result = await response.json();
         setPlanResult(result);
+        showNotification('Perfect timing found! Check the recommendations below.');
       } else {
         throw new Error('Failed to create plan');
       }
     } catch (error) {
       console.error('Planning error:', error);
-      // Show a beautiful error notification instead of alert
-      console.log('Failed to create defer plan. Please try again.');
+      showNotification('Failed to create defer plan. Please try again.', 'error');
     } finally {
       setIsPlanning(false);
     }
@@ -106,13 +112,14 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
       });
       
       if (response.ok) {
-        console.log('Meeting block created successfully!');
+        showNotification('Meeting block created successfully! Check your calendar.');
         handleClose();
       } else {
         throw new Error('Failed to create meeting');
       }
     } catch (error) {
       console.error('Failed to create meeting:', error);
+      showNotification('Failed to create meeting block. Please try again.', 'error');
     }
   };
 
@@ -130,19 +137,24 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
       });
       
       if (response.ok) {
-        console.log('Events moved successfully!');
+        showNotification('Events moved successfully! Your calendar has been updated.');
       } else {
         throw new Error('Failed to move events');
       }
     } catch (error) {
       console.error('Failed to move events:', error);
+      showNotification('Failed to move events. Please try again.', 'error');
     }
   };
 
-  const handleCopyMessage = () => {
+  const handleCopyMessage = async () => {
     if (planResult?.deferMessage) {
-      navigator.clipboard.writeText(planResult.deferMessage);
-      console.log('Defer message copied to clipboard!');
+      try {
+        await navigator.clipboard.writeText(planResult.deferMessage);
+        showNotification('Defer message copied to clipboard!');
+      } catch (error) {
+        showNotification('Failed to copy message. Please copy it manually.', 'error');
+      }
     }
   };
 
@@ -174,7 +186,7 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
         const data = await response.json();
         const assistantMessage: AgentMessage = {
           role: 'assistant',
-          content: data.message,
+          content: data.response || data.message,
           timestamp: new Date().toISOString(),
           actions: data.actions
         };
@@ -186,7 +198,7 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
       console.error('Chat error:', error);
       const errorMessage: AgentMessage = {
         role: 'assistant',
-        content: "I'm having trouble connecting to Gemini AI right now. You can use the 'Plan defer now' option for automated suggestions.",
+        content: "I'm having trouble connecting to the AI assistant right now. You can use the 'Plan defer now' option for automated suggestions.",
         timestamp: new Date().toISOString()
       };
       setChatMessages(prev => [...prev, errorMessage]);
@@ -230,6 +242,17 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
       }`}
       style={{ background: 'rgba(0, 0, 0, 0.4)' }}
     >
+      {/* Notification */}
+      {notification && (
+        <div className={`fixed top-4 right-4 z-60 p-4 rounded-lg shadow-lg transition-all duration-300 ${
+          notification.type === 'success' 
+            ? 'bg-gradient-to-r from-green-500 to-emerald-500' 
+            : 'bg-gradient-to-r from-red-500 to-pink-500'
+        } text-white font-medium`}>
+          {notification.message}
+        </div>
+      )}
+
       <div 
         className={`glass rounded-3xl shadow-2xl max-w-4xl w-full mx-6 max-h-[90vh] flex flex-col transform transition-all duration-500 ${
           isVisible ? 'scale-100 translate-y-0' : 'scale-95 translate-y-10'
@@ -239,22 +262,22 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
         <div className="p-8 border-b border-white border-opacity-20">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <div className="flex items-center space-x-3 mb-2">
-                <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${getImportanceGradient()} animate-pulse`}></div>
-                <span className="text-sm font-medium text-white text-opacity-80">
+              <div className="flex items-center space-x-3 mb-3">
+                <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${getImportanceGradient()} animate-pulse shadow-lg`}></div>
+                <span className="text-sm font-bold text-white text-opacity-90 text-shadow">
                   From {email.company}
                 </span>
               </div>
-              <h2 className="text-2xl font-bold text-white text-shadow-lg mb-2">
+              <h2 className="text-2xl font-bold text-white text-shadow-lg mb-3">
                 {email.subject}
               </h2>
-              <p className="text-white text-opacity-80">
-                From: <span className="font-semibold">{email.name}</span> &lt;{email.from}&gt;
+              <p className="text-white text-opacity-90 text-shadow">
+                From: <span className="font-bold">{email.name}</span> &lt;{email.from}&gt;
               </p>
             </div>
             <button
               onClick={handleClose}
-              className="p-2 rounded-full bg-red-500 bg-opacity-80 hover:bg-red-600 hover:bg-opacity-90 transition-all duration-300 transform hover:scale-110 text-white"
+              className="p-3 rounded-full bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-110 text-white shadow-lg"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -268,15 +291,15 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
           {/* Summary Card */}
           <div className="card-glass p-6 mb-8 animate-slide-in-up">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center shadow-lg">
                 <span className="text-white font-bold text-sm">AI</span>
               </div>
-              <h3 className="text-lg font-bold text-white">Smart Summary</h3>
+              <h3 className="text-xl font-bold text-white text-shadow-lg">Smart Summary</h3>
             </div>
-            <p className="text-white text-opacity-90 leading-relaxed">
+            <p className="text-white text-opacity-90 leading-relaxed text-shadow">
               {summary || (
-                <div className="flex items-center space-x-2">
-                  <div className="spinner w-4 h-4"></div>
+                <div className="flex items-center space-x-3">
+                  <div className="spinner w-5 h-5"></div>
                   <span>Analyzing email content...</span>
                 </div>
               )}
@@ -289,13 +312,13 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
               <button
                 onClick={handlePlanDefer}
                 disabled={isPlanning}
-                className="btn-primary group relative overflow-hidden"
+                className="btn-primary group relative overflow-hidden transform hover:scale-105 transition-all duration-300"
               >
                 <div className="flex items-center justify-center space-x-3">
                   {isPlanning ? (
                     <>
                       <div className="spinner"></div>
-                      <span>Planning Perfect Time...</span>
+                      <span>Finding Perfect Time...</span>
                     </>
                   ) : (
                     <>
@@ -309,11 +332,11 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
               
               <button
                 onClick={startChat}
-                className="btn-ghost group relative overflow-hidden"
+                className="btn-ghost group relative overflow-hidden transform hover:scale-105 transition-all duration-300"
               >
                 <div className="flex items-center justify-center space-x-3">
                   <span className="text-2xl">🤖</span>
-                  <span className="font-bold">Ask Gemini AI</span>
+                  <span className="font-bold">Ask AI Assistant</span>
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-teal-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
               </button>
@@ -323,31 +346,31 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
           {/* Plan Result */}
           {planResult && (
             <div className="card-glass p-6 mb-8 animate-slide-in-up">
-              <h3 className="text-xl font-bold text-white mb-6 flex items-center space-x-2">
+              <h3 className="text-xl font-bold text-white mb-6 flex items-center space-x-2 text-shadow-lg">
                 <span>⭐</span>
                 <span>Recommended Plan</span>
               </h3>
               
-              <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl p-6 mb-6">
+              <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl p-6 mb-6 shadow-xl">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <p className="text-white text-opacity-80 text-sm">Best Time</p>
-                    <p className="text-2xl font-bold text-white">
+                    <p className="text-white text-opacity-90 text-sm font-medium">Best Time</p>
+                    <p className="text-3xl font-bold text-white text-shadow">
                       {formatTime(planResult.slot.startISO)}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-white text-opacity-80 text-sm">Confidence</p>
-                    <p className="text-2xl font-bold text-white">
+                    <p className="text-white text-opacity-90 text-sm font-medium">Confidence</p>
+                    <p className="text-3xl font-bold text-white text-shadow">
                       {Math.round(planResult.slot.confidence * 100)}%
                     </p>
                   </div>
                 </div>
-                <p className="text-white text-opacity-90 text-sm">{planResult.slot.reason}</p>
+                <p className="text-white text-opacity-95 text-sm leading-relaxed">{planResult.slot.reason}</p>
                 
                 {planResult.slot.movedEvents && planResult.slot.movedEvents.length > 0 && (
-                  <div className="mt-4 p-4 bg-yellow-400 bg-opacity-20 rounded-xl">
-                    <p className="text-white font-semibold flex items-center space-x-2">
+                  <div className="mt-4 p-4 bg-yellow-400 bg-opacity-20 rounded-xl backdrop-blur-sm">
+                    <p className="text-white font-bold flex items-center space-x-2">
                       <span>📅</span>
                       <span>Will move: {planResult.slot.movedEvents.map(e => e.title).join(', ')}</span>
                     </p>
@@ -359,7 +382,7 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <button
                   onClick={handleCreateMeeting}
-                  className="btn-secondary group"
+                  className="btn-secondary group transform hover:scale-105 transition-all duration-300"
                 >
                   <span className="mr-2">📅</span>
                   Create Meeting
@@ -368,7 +391,7 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
                 {planResult.slot.movedEvents && planResult.slot.movedEvents.length > 0 && (
                   <button
                     onClick={handleApplyMoves}
-                    className="btn-secondary group"
+                    className="btn-secondary group transform hover:scale-105 transition-all duration-300"
                   >
                     <span className="mr-2">🔄</span>
                     Apply Moves
@@ -377,12 +400,22 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
                 
                 <button
                   onClick={handleCopyMessage}
-                  className="btn-secondary group"
+                  className="btn-secondary group transform hover:scale-105 transition-all duration-300"
                 >
                   <span className="mr-2">📋</span>
                   Copy Message
                 </button>
               </div>
+
+              {/* Defer Message Preview */}
+              {planResult.deferMessage && (
+                <div className="mt-6 p-4 glass-dark rounded-xl">
+                  <h4 className="text-sm font-bold text-white mb-2 text-shadow">Suggested Response:</h4>
+                  <p className="text-white text-opacity-90 text-sm leading-relaxed text-shadow">
+                    {planResult.deferMessage}
+                  </p>
+                </div>
+              )}
             </div>
           )}
 
@@ -390,9 +423,9 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
           {showChat && (
             <div className="card-glass overflow-hidden animate-slide-in-up">
               <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-4">
-                <h3 className="text-white font-bold flex items-center space-x-2">
+                <h3 className="text-white font-bold flex items-center space-x-2 text-shadow">
                   <span>🤖</span>
-                  <span>Gemini AI Assistant</span>
+                  <span>AI Assistant</span>
                 </h3>
               </div>
               
@@ -403,10 +436,10 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
                     className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
                     <div
-                      className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${
+                      className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl shadow-lg ${
                         message.role === 'user'
                           ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
-                          : 'bg-gray-800 text-white border border-gray-600'
+                          : 'bg-gradient-to-r from-gray-700 to-gray-800 text-white border border-gray-600'
                       } animate-slide-in-up`}
                       style={{ animationDelay: `${index * 0.1}s` }}
                     >
@@ -417,7 +450,7 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
                 
                 {isChatLoading && (
                   <div className="flex justify-start">
-                    <div className="bg-gray-800 px-4 py-3 rounded-2xl border border-gray-600">
+                    <div className="bg-gradient-to-r from-gray-700 to-gray-800 px-4 py-3 rounded-2xl border border-gray-600 shadow-lg">
                       <div className="flex space-x-2">
                         <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
                         <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
@@ -442,7 +475,7 @@ export default function EmailDrawer({ email, onClose }: EmailDrawerProps) {
                   <button
                     onClick={handleSendChatMessage}
                     disabled={isChatLoading || !chatInput.trim()}
-                    className="btn-primary px-6"
+                    className="btn-primary px-6 transform hover:scale-105 transition-all duration-300"
                   >
                     <span>Send</span>
                     <span className="ml-2">🚀</span>

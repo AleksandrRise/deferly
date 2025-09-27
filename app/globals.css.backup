@@ -43,25 +43,23 @@
   --color-purple-800: #4C1D95;
 }
 
-/* Glass morphism effect - IMPROVED CONTRAST */
+/* Glass morphism effect */
 @utility glass {
-  background: rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
   color: white;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 @utility glass-dark {
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
   color: white;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 /* Gradient backgrounds */
@@ -147,7 +145,7 @@
 }
 
 @layer components {
-  /* Modern buttons - IMPROVED */
+  /* Modern buttons */
   .btn-primary {
     padding: 0.75rem 1.5rem;
     border-radius: 0.75rem;
@@ -157,7 +155,6 @@
     transform: scale(1);
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
   }
 
   .btn-primary:hover {
@@ -197,17 +194,16 @@
     border-radius: 0.75rem;
     font-weight: 600;
     color: white;
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(4px);
     border: 1px solid rgba(255, 255, 255, 0.3);
     transition: all 0.3s;
     transform: scale(1);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
   }
 
   .btn-ghost:hover {
     transform: scale(1.05);
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(255, 255, 255, 0.25);
     color: white;
     box-shadow: 0 10px 25px rgba(255, 255, 255, 0.2);
   }
@@ -216,7 +212,7 @@
     transform: scale(0.95);
   }
 
-  /* Card styles - IMPROVED */
+  /* Card styles */
   .card {
     background-color: white;
     border-radius: 1rem;
@@ -235,18 +231,17 @@
     border-radius: 1rem;
     transition: all 0.3s;
     transform: scale(1);
-    background: rgba(0, 0, 0, 0.35);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
     color: white;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
   }
 
   .card-glass:hover {
     transform: scale(1.02);
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(255, 255, 255, 0.2);
   }
 
   /* Input styles */
@@ -273,7 +268,7 @@
     color: #6b7280;
   }
 
-  /* Navigation - IMPROVED */
+  /* Navigation */
   .nav-link {
     padding: 0.75rem 1rem;
     border-radius: 0.5rem;
@@ -281,8 +276,6 @@
     transition: all 0.3s;
     position: relative;
     overflow: hidden;
-    color: white;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   }
 
   .nav-link::before {
@@ -301,10 +294,9 @@
   }
 
   .nav-link.active {
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(255, 255, 255, 0.2);
     color: white;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
   }
 }
 
@@ -326,11 +318,11 @@
   }
   
   .text-shadow {
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
   
   .text-shadow-lg {
-    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   }
 
   /* Consistent padding utilities */
@@ -447,115 +439,4 @@
 
 .animate-slide-in-up {
   animation: slideInUp 0.6s ease-out;
-}
-
-/* Mobile Responsive Improvements */
-@media (max-width: 768px) {
-  .glass, .glass-dark, .card-glass {
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-  }
-  
-  .nav-link {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.875rem;
-  }
-  
-  .btn-primary, .btn-secondary, .btn-ghost {
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-  }
-  
-  .text-shadow-lg {
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  }
-  
-  /* Ensure text is readable on small screens */
-  .text-white {
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  }
-}
-
-@media (max-width: 640px) {
-  .glass, .glass-dark, .card-glass {
-    margin: 0.5rem;
-    border-radius: 1rem;
-  }
-  
-  .animate-float {
-    animation-duration: 4s;
-  }
-  
-  /* Reduce animation intensity on mobile */
-  .animate-glow {
-    animation: none;
-  }
-  
-  /* Better touch targets */
-  button, .btn-primary, .btn-secondary, .btn-ghost {
-    min-height: 44px;
-    min-width: 44px;
-  }
-}
-
-/* Print styles */
-@media print {
-  .glass, .glass-dark, .card-glass {
-    background: white !important;
-    color: black !important;
-    border: 1px solid #ccc !important;
-    box-shadow: none !important;
-    backdrop-filter: none !important;
-  }
-  
-  .bg-gradient-primary {
-    background: white !important;
-  }
-  
-  .animate-float, .animate-glow, .animate-bounce, .animate-pulse {
-    animation: none !important;
-  }
-}
-
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-  .glass, .glass-dark, .card-glass {
-    background: rgba(0, 0, 0, 0.8) !important;
-    border: 2px solid white !important;
-  }
-  
-  .text-white {
-    color: white !important;
-    text-shadow: 0 0 2px black !important;
-  }
-}
-
-/* Reduced motion support */
-@media (prefers-reduced-motion: reduce) {
-  .animate-float, .animate-glow, .animate-bounce, .animate-pulse,
-  .animate-slide-in-left, .animate-slide-in-right, .animate-slide-in-up {
-    animation: none !important;
-  }
-  
-  * {
-    transition-duration: 0.01ms !important;
-  }
-}
-
-/* Dark mode improvements */
-@media (prefers-color-scheme: dark) {
-  .card {
-    background-color: #1f2937 !important;
-    color: white !important;
-  }
-  
-  .input-modern {
-    background: rgba(0, 0, 0, 0.5) !important;
-    color: white !important;
-    border-color: rgba(255, 255, 255, 0.3) !important;
-  }
-  
-  .input-modern::placeholder {
-    color: rgba(255, 255, 255, 0.6) !important;
-  }
 }

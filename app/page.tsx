@@ -152,8 +152,8 @@ export default function Home() {
       <div className="h-screen flex items-center justify-center bg-gradient-primary">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-          <h2 className="text-2xl font-bold text-white mb-2">Loading Deferly</h2>
-          <p className="text-white text-opacity-80">Preparing your smart inbox...</p>
+          <h2 className="text-2xl font-bold text-white mb-2 text-shadow-lg">Loading Deferly</h2>
+          <p className="text-white text-opacity-80 text-shadow">Preparing your smart inbox...</p>
           <div className="flex justify-center space-x-1 mt-4">
             <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
             <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
@@ -239,25 +239,25 @@ export default function Home() {
               
               {/* Quick stats */}
               <div className="flex space-x-4">
-                <div className="glass-dark rounded-xl px-4 py-2">
+                <div className="glass-dark rounded-xl px-4 py-3 transform hover:scale-105 transition-all duration-300">
                   <div className="text-center">
-                    <div className="text-lg font-bold text-white">
+                    <div className="text-lg font-bold text-white text-shadow">
                       {emails.filter(e => !e.status || e.status === 'inbox').length}
                     </div>
                     <div className="text-white text-opacity-70 text-xs">Unread</div>
                   </div>
                 </div>
-                <div className="glass-dark rounded-xl px-4 py-2">
+                <div className="glass-dark rounded-xl px-4 py-3 transform hover:scale-105 transition-all duration-300">
                   <div className="text-center">
-                    <div className="text-lg font-bold text-white">
+                    <div className="text-lg font-bold text-white text-shadow">
                       {emails.filter(e => e.deadlineISO).length}
                     </div>
                     <div className="text-white text-opacity-70 text-xs">Urgent</div>
                   </div>
                 </div>
-                <div className="glass-dark rounded-xl px-4 py-2">
+                <div className="glass-dark rounded-xl px-4 py-3 transform hover:scale-105 transition-all duration-300">
                   <div className="text-center">
-                    <div className="text-lg font-bold text-white">
+                    <div className="text-lg font-bold text-white text-shadow">
                       {Math.round(emails.reduce((sum, e) => sum + (e.estimatedMinutes || 0), 0) / 60)}h
                     </div>
                     <div className="text-white text-opacity-70 text-xs">Est. Time</div>
@@ -296,18 +296,18 @@ export default function Home() {
               <h3 className="text-2xl font-bold text-white text-shadow-lg mb-4">
                 Select an email to get started
               </h3>
-              <p className="text-white text-opacity-80 text-lg leading-relaxed">
+              <p className="text-white text-opacity-90 text-lg leading-relaxed text-shadow">
                 Choose an email from your inbox and I&apos;ll help you find the perfect time to respond with smart scheduling suggestions.
               </p>
               <div className="mt-8 flex justify-center space-x-4">
-                <div className="glass-dark rounded-xl px-4 py-3 animate-pulse">
-                  <span className="text-white text-opacity-80 text-sm">💡 Smart Planning</span>
+                <div className="glass-dark rounded-xl px-4 py-3 animate-pulse transform hover:scale-105 transition-all duration-300">
+                  <span className="text-white text-opacity-90 text-sm font-medium">💡 Smart Planning</span>
                 </div>
-                <div className="glass-dark rounded-xl px-4 py-3 animate-pulse" style={{ animationDelay: '0.5s' }}>
-                  <span className="text-white text-opacity-80 text-sm">🤖 AI Assistant</span>
+                <div className="glass-dark rounded-xl px-4 py-3 animate-pulse transform hover:scale-105 transition-all duration-300" style={{ animationDelay: '0.5s' }}>
+                  <span className="text-white text-opacity-90 text-sm font-medium">🤖 AI Assistant</span>
                 </div>
-                <div className="glass-dark rounded-xl px-4 py-3 animate-pulse" style={{ animationDelay: '1s' }}>
-                  <span className="text-white text-opacity-80 text-sm">📅 Calendar Sync</span>
+                <div className="glass-dark rounded-xl px-4 py-3 animate-pulse transform hover:scale-105 transition-all duration-300" style={{ animationDelay: '1s' }}>
+                  <span className="text-white text-opacity-90 text-sm font-medium">📅 Calendar Sync</span>
                 </div>
               </div>
             </div>
@@ -325,8 +325,9 @@ export default function Home() {
       
       {/* Floating action hints */}
       <div className="fixed bottom-6 right-6 space-y-3 z-40">
-        <div className="glass-dark rounded-full p-3 animate-bounce">
-          <span className="text-white text-opacity-80 text-sm">💡</span>
+        <div className="glass-dark rounded-full p-3 animate-bounce transform hover:scale-110 transition-all duration-300 cursor-pointer" 
+             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          <span className="text-white text-opacity-80 text-xl">💡</span>
         </div>
       </div>
     </div>

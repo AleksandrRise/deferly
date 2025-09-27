@@ -27,13 +27,16 @@ export default function EmailList({ emails, selectedEmailId, onSelectEmail }: Em
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp);
     const now = new Date();
-    const diffHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
+    const diffMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
     
-    if (diffHours < 1) {
+    if (diffMinutes < 1) {
       return 'Just now';
-    } else if (diffHours < 24) {
-      return `${Math.floor(diffHours)}h ago`;
-    } else if (diffHours < 48) {
+    } else if (diffMinutes < 60) {
+      return `${diffMinutes}m ago`;
+    } else if (diffMinutes < 1440) { // 24 hours
+      const hours = Math.floor(diffMinutes / 60);
+      return `${hours}h ago`;
+    } else if (diffMinutes < 2880) { // 48 hours
       return 'Yesterday';
     } else {
       return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -42,10 +45,10 @@ export default function EmailList({ emails, selectedEmailId, onSelectEmail }: Em
 
   const getImportanceGradient = (email: Email) => {
     const importance = calculateImportance(email).score;
-    if (importance >= 0.8) return 'bg-gradient-to-r from-red-400 to-pink-500';
-    if (importance >= 0.6) return 'bg-gradient-to-r from-orange-400 to-yellow-500';
-    if (importance >= 0.4) return 'bg-gradient-to-r from-yellow-400 to-green-500';
-    return 'bg-gradient-to-r from-blue-400 to-purple-500';
+    if (importance >= 0.8) return 'from-red-400 to-pink-500';
+    if (importance >= 0.6) return 'from-orange-400 to-yellow-500';
+    if (importance >= 0.4) return 'from-yellow-400 to-green-500';
+    return 'from-blue-400 to-purple-500';
   };
 
   const getImportanceIcon = (email: Email) => {
@@ -68,32 +71,40 @@ export default function EmailList({ emails, selectedEmailId, onSelectEmail }: Em
           <h2 className="text-2xl font-bold text-white text-shadow-lg">✉️ Inbox</h2>
           <div className="flex items-center space-x-2">
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-            <span className="text-sm text-white text-opacity-80">{emails.length} emails</span>
+            <span className="text-sm text-white text-opacity-80 font-medium">{emails.length} emails</span>
           </div>
         </div>
         
-        {/* Sort toggle */}
-        <div className="flex glass rounded-xl p-1">
-          <button
-            onClick={() => setSortMode('importance')}
-            className={`flex-1 px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-300 ${
-              sortMode === 'importance'
-                ? 'bg-white text-purple-600 shadow-lg transform scale-105'
-                : 'text-white text-opacity-80 hover:text-purple-600 hover:bg-white hover:bg-opacity-90'
-            }`}
-          >
-            🎯 Importance
-          </button>
-          <button
-            onClick={() => setSortMode('recency')}
-            className={`flex-1 px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-300 ${
-              sortMode === 'recency'
-                ? 'bg-white text-purple-600 shadow-lg transform scale-105'
-                : 'text-white text-opacity-80 hover:text-purple-600 hover:bg-white hover:bg-opacity-90'
-            }`}
-          >
-            ⏰ Recency
-          </button>
+        {/* Sort toggle - COMPLETELY FIXED HOVER */}
+        <div className="glass rounded-xl p-1 backdrop-blur-md">
+          <div className="flex">
+            <button
+              onClick={() => setSortMode('importance')}
+              className={`flex-1 px-4 py-3 text-sm font-bold rounded-lg transition-all duration-300 transform relative ${
+                sortMode === 'importance'
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg scale-105'
+                  : 'text-white text-opacity-70 hover:text-white hover:bg-white hover:bg-opacity-25 hover:scale-102'
+              }`}
+            >
+              <div className="flex items-center justify-center space-x-2 relative z-10">
+                <span>🎯</span>
+                <span>Importance</span>
+              </div>
+            </button>
+            <button
+              onClick={() => setSortMode('recency')}
+              className={`flex-1 px-4 py-3 text-sm font-bold rounded-lg transition-all duration-300 transform relative ${
+                sortMode === 'recency'
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg scale-105'
+                  : 'text-white text-opacity-70 hover:text-white hover:bg-white hover:bg-opacity-25 hover:scale-102'
+              }`}
+            >
+              <div className="flex items-center justify-center space-x-2 relative z-10">
+                <span>⏰</span>
+                <span>Recency</span>
+              </div>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -110,18 +121,23 @@ export default function EmailList({ emails, selectedEmailId, onSelectEmail }: Em
               onClick={() => onSelectEmail(email.id)}
               onMouseEnter={() => setHoveredEmail(email.id)}
               onMouseLeave={() => setHoveredEmail(null)}
-              className={`card-glass p-4 cursor-pointer transition-all duration-500 transform animate-slide-in-up ${
+              className={`card-glass p-4 cursor-pointer transition-all duration-500 transform animate-slide-in-up relative overflow-hidden ${
                 isSelected
-                  ? 'scale-105 ring-2 ring-purple-400 ring-opacity-70 bg-purple-600 bg-opacity-20'
+                  ? 'scale-105 ring-2 ring-purple-400 ring-opacity-70 shadow-2xl'
                   : isHovered
-                  ? 'scale-102 bg-white bg-opacity-15'
-                  : 'hover:bg-white hover:bg-opacity-10'
+                  ? 'scale-102 shadow-xl'
+                  : 'hover:shadow-lg'
               }`}
-              style={{ animationDelay: `${index * 0.1}s` }}
+              style={{ animationDelay: `${index * 0.05}s` }}
             >
-              <div className="flex items-start space-x-4">
+              {/* Hover glow effect */}
+              {(isHovered || isSelected) && (
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 opacity-10 rounded-lg"></div>
+              )}
+              
+              <div className="flex items-start space-x-4 relative z-10">
                 {/* Company Avatar */}
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-sm ${getImportanceGradient(email)} animate-glow`}>
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-sm bg-gradient-to-r ${getImportanceGradient(email)} animate-glow shadow-lg`}>
                   {getCompanyInitials(email.company)}
                 </div>
                 
@@ -129,50 +145,52 @@ export default function EmailList({ emails, selectedEmailId, onSelectEmail }: Em
                   {/* Header */}
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-2">
-                      <span className="text-lg">{getImportanceIcon(email)}</span>
-                      <p className="text-sm font-bold text-white truncate">
+                      <span className="text-lg animate-bounce-slow">{getImportanceIcon(email)}</span>
+                      <p className="text-sm font-bold text-white truncate text-shadow">
                         {email.name}
                       </p>
                     </div>
                     <div className="flex items-center space-x-1">
                       <div className="w-1 h-1 bg-white bg-opacity-60 rounded-full"></div>
-                      <p className="text-xs text-white text-opacity-70">
+                      <p className="text-xs text-white text-opacity-70 font-medium">
                         {formatTime(email.timestamp)}
                       </p>
                     </div>
                   </div>
                   
                   {/* Subject */}
-                  <h3 className="text-white font-semibold mb-2 line-clamp-1">
+                  <h3 className="text-white font-bold mb-2 line-clamp-1 text-shadow">
                     {email.subject}
                   </h3>
                   
                   {/* Preview */}
-                  <p className="text-white text-opacity-80 text-sm mb-3 line-clamp-2">
+                  <p className="text-white text-opacity-90 text-sm mb-3 line-clamp-2 text-shadow">
                     {email.preview}
                   </p>
                   
                   {/* Metadata badges */}
-                  <div className="flex items-center space-x-2 flex-wrap">
+                  <div className="flex items-center space-x-2 flex-wrap gap-1">
                     {sortMode === 'importance' && (
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${getImportanceGradient(email)} text-white`}>
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r ${getImportanceGradient(email)} text-white shadow-lg`}>
                         {Math.round(importance.score * 100)}%
                       </span>
                     )}
                     
                     {email.deadlineISO && (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-red-500 to-pink-500 text-white animate-pulse">
-                        ⚠️ Deadline
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-red-500 to-pink-500 text-white animate-pulse shadow-lg">
+                        <span className="mr-1">⚠️</span>
+                        Deadline
                       </span>
                     )}
                     
                     {email.hasAttachment && (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-blue-500 to-indigo-500 text-white">
-                        📎 File
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg">
+                        <span className="mr-1">📎</span>
+                        File
                       </span>
                     )}
                     
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white bg-opacity-20 text-white">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white bg-opacity-20 text-white backdrop-blur-sm shadow-lg">
                       {email.estimatedMinutes}min
                     </span>
                   </div>
@@ -181,14 +199,14 @@ export default function EmailList({ emails, selectedEmailId, onSelectEmail }: Em
                 {/* Action indicator */}
                 {isSelected && (
                   <div className="flex items-center">
-                    <div className="w-3 h-3 bg-gradient-to-r from-green-400 to-blue-500 rounded-full animate-pulse"></div>
+                    <div className="w-3 h-3 bg-gradient-to-r from-green-400 to-blue-500 rounded-full animate-pulse shadow-lg"></div>
                   </div>
                 )}
               </div>
 
-              {/* Hover effect line */}
-              {isHovered && (
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-400 to-pink-400 rounded-b-2xl animate-pulse"></div>
+              {/* Bottom accent line */}
+              {isSelected && (
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 rounded-b-lg animate-pulse"></div>
               )}
             </div>
           );
@@ -197,9 +215,9 @@ export default function EmailList({ emails, selectedEmailId, onSelectEmail }: Em
         {/* Empty state */}
         {sortedEmails.length === 0 && (
           <div className="text-center py-12">
-            <div className="text-6xl mb-4 animate-bounce-slow">📭</div>
-            <h3 className="text-xl font-semibold text-white mb-2">No emails found</h3>
-            <p className="text-white text-opacity-70">Your inbox is empty or all emails are filtered out.</p>
+            <div className="text-6xl mb-4 animate-float">📭</div>
+            <h3 className="text-xl font-bold text-white mb-2 text-shadow-lg">No emails found</h3>
+            <p className="text-white text-opacity-70 text-shadow">Your inbox is empty or all emails are filtered out.</p>
           </div>
         )}
       </div>
